@@ -1,0 +1,38 @@
+#TASK 1 TITANIC SURVIVAL prediction
+# Importing necessary libraries
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import LabelEncoder
+
+# Loading the Titanic dataset
+
+titanic_df = pd.read_csv('C:\\Users\\511ws\\Downloads\\Titanic.csv')
+
+# Data preprocessing
+# Dropping unnecessary columns and handle missing values
+titanic_df.drop(['PassengerId', 'Name', 'Ticket', 'Cabin'], axis=1, inplace=True)
+titanic_df['Age'].fillna(titanic_df['Age'].median(), inplace=True)
+titanic_df['Embarked'].fillna(titanic_df['Embarked'].mode()[0], inplace=True)
+
+
+label_encoders = {}
+for col in ['Sex', 'Embarked']:
+    label_encoders[col] = LabelEncoder()
+    titanic_df[col] = label_encoders[col].fit_transform(titanic_df[col])
+
+# Splitting the data into training and validation sets
+X_train, X_val, y_train, y_val = train_test_split(titanic_df.drop('Survived', axis=1), titanic_df['Survived'], test_size=0.2, random_state=42)
+
+# Model training
+model = RandomForestClassifier(random_state=42)  # Using RandomForestClassifier for model training
+model.fit(X_train, y_train)
+
+# Model evaluation
+y_pred = model.predict(X_val)
+accuracy = accuracy_score(y_val, y_pred)
+print("Accuracy:", accuracy)
+print("Classification Report:")
+print(classification_report(y_val, y_pred))
